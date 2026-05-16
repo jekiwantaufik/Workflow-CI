@@ -1,12 +1,14 @@
-name: MLflow CI Pipeline
+name: CI Training Model
 
 on:
   push:
-    branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  train-model:
+  train:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +28,12 @@ jobs:
         run: |
           cd MLProject
           python modelling.py
+
+      - name: Commit artifacts
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git add .
+          git commit -m "Save artifacts" || echo "No changes"
+          git push
