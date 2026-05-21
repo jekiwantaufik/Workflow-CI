@@ -4,9 +4,6 @@ on:
   push:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   train:
     runs-on: ubuntu-latest
@@ -14,29 +11,20 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install MLflow
+      - name: Install dependencies
         run: |
-          pip install mlflow
+          pip install pandas scikit-learn mlflow dagshub matplotlib seaborn joblib
+
+      - name: Show MLproject
+        run: |
+          cat MLProject/MLproject
 
       - name: Run MLflow Project
         run: |
           mlflow run MLProject
-
-      - name: Commit artifacts
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          git add MLProject/
-
-          git commit -m "Save retraining artifacts" || echo "No changes"
-
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
