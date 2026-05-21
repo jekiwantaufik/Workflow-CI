@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install MLflow
         run: |
           pip install mlflow
 
@@ -30,13 +30,13 @@ jobs:
         run: |
           mlflow run MLProject
 
-      - name: Commit artifacts to repo
+      - name: Commit artifacts
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
           git add MLProject/
 
-          git commit -m "Save training artifacts" || echo "No changes to commit"
+          git commit -m "Save retraining artifacts" || echo "No changes"
 
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
