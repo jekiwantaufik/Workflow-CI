@@ -4,12 +4,15 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   train:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -19,12 +22,27 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas scikit-learn mlflow dagshub matplotlib seaborn joblib
+          python -m pip install --upgrade pip
+          pip install mlflow==2.19.0
+          pip install pandas scikit-learn dagshub matplotlib seaborn joblib
 
-      - name: Show MLproject
+      - name: Verify MLProject structure
         run: |
+          ls
+          ls MLProject
           cat MLProject/MLproject
 
       - name: Run MLflow Project
         run: |
-          mlflow run MLProject
+          mlflow run MLProject --env-manager local
+
+      - name: Commit artifacts
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git add .
+
+          git commit -m "Update training artifacts" || echo "No changes"
+
+          git push
